@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\PostController;
-use Illuminate\Support\Facades\Route;
+// use App\Http\Controllers\PostController;
+// use Illuminate\Support\Facades\Route; -->
 
 /*
 |--------------------------------------------------------------------------
@@ -31,7 +31,12 @@ use Illuminate\Support\Facades\Route;
 //     return view('about');
 // });
 
-Route::get('/posts', [PostController::class, 'index']);
+// Route::get('/posts', [PostController::class, 'index']);
+
+use App\Http\Controllers\StudentController;
+
+Route::get('/students', [StudentController::class, 'index']);
+
 
 
 
