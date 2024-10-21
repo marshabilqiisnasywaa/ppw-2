@@ -30,8 +30,6 @@
             <button type="submit" class="btn btn-primary">Cari</button>
         </form>
 
-
-
         <!-- Tabel Daftar Buku -->
         <table class="table table-striped table-bordered table-hover">
             <thead>

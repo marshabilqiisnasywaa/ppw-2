@@ -68,6 +68,8 @@ Route::put('/buku/{id}/update', [BukuController::class, 'update'])->name('buku.u
 Route::get('/buku/{id}', [BukuController::class, 'show'])->name('buku.show');
 
 // Route untuk menampilkan fitur searching
+// web.php
+
 Route::get('/buku/search', [BukuController::class, 'search'])->name('buku.search');
 
 

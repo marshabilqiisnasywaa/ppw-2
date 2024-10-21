@@ -18,7 +18,10 @@
     </div>
 
     <!-- jQuery -->
-    <script src="{{ asset('js/jquery.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script>
+        window.jQuery || document.write('<script src="{{ asset('js/jquery.js') }}"><\/script>')
+    </script>
 
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -26,9 +29,11 @@
     <!-- Datepicker -->
     <script src="{{ asset('js/bootstrap-datepicker.js') }}"></script>
     <script type="text/javascript">
-        $('.date').datepicker({
-            format: 'yyyy/mm/dd',
-            autoclose: true
+        $(document).ready(function() {
+            $('.date').datepicker({
+                format: 'yyyy/mm/dd',
+                autoclose: true
+            });
         });
     </script>
 

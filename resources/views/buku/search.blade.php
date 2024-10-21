@@ -1,9 +1,9 @@
 @extends('layouts.app3')
 
 @section('content')
-    @if(count($data_buku))
+    @if($jumlah_buku > 0)
         <div class="alert alert-success">
-            Ditemukan <strong>{{ count($data_buku) }}</strong> data dengan kata: <strong>{{ $cari }}</strong>
+            Ditemukan <strong>{{ $jumlah_buku }}</strong> data dengan kata: <strong>{{ $cari }}</strong>
         </div>
     @else
         <div class="alert alert-warning">
@@ -11,11 +11,6 @@
             <a href="{{ route('buku.index') }}" class="btn btn-warning">Kembali</a>
         </div>
     @endif
-
-    <div class="d-flex justify-content-between">
-        <h1>Daftar Buku</h1>
-        <a href="{{ route('buku.create') }}" class="btn btn-primary">Tambah Buku</a>
-    </div>
 
     <table class="table table-striped table-bordered table-hover">
         <thead>
@@ -50,6 +45,14 @@
         </tbody>
     </table>
 
-    <div>{{ $data_buku->links('pagination::bootstrap-5') }}</div>
-    <p><strong>Jumlah Buku: </strong> {{ $jumlah_buku }}</p>
+    <div class="d-flex justify-content-between align-items-center">
+        <div>{{ $data_buku->links('pagination::bootstrap-5') }}</div>
+        <p class="mb-0"><strong>Jumlah Buku: </strong> {{ $jumlah_buku }}</p>
+    </div>
+@endsection
+
+@section('scripts')
+<script>
+    // Any additional scripts specific to this page can be included here.
+</script>
 @endsection

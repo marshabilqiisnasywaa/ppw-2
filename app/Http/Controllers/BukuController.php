@@ -7,14 +7,16 @@ use App\Models\Buku;
 
 class BukuController extends Controller
 {
-    public function index() {
-        $batas = 5;
-        $data_buku = Buku::orderBy('id', 'desc')->paginate($batas);
+    // Fungsi untuk menampilkan daftar buku
+    public function index()
+    {
+        $batas = 5;  // Pagination limit
+        $data_buku = Buku::paginate($batas);
         $jumlah_buku = Buku::count();
+        $total_harga = Buku::sum('harga');
         $no = $batas * ($data_buku->currentPage() - 1);
-        $total_harga = $data_buku->sum('harga');
 
-        return view('buku.index', compact('data_buku', 'no', 'jumlah_buku', 'total_harga'));
+        return view('buku.index', compact('data_buku', 'jumlah_buku', 'total_harga', 'no'));
     }
 
     public function create() {
@@ -90,20 +92,25 @@ class BukuController extends Controller
         return redirect('/buku')->with('pesan', 'Data Buku Berhasil diperbarui!');
     }
 
-    public function search(Request $request) {
-        $batas = 5;
-        $cari = $request->input('kata');
+    // BukuController.php
+    public function search(Request $request)
+{
+    $batas = 5;  // Batasi jumlah data per halaman
+    $cari = $request->kata;  // Ambil input pencarian dari form
+    
+    // Query pencarian, cari berdasarkan judul atau penulis
+    $data_buku = Buku::where('judul', 'like', "%" . $cari . "%")
+        ->orWhere('penulis', 'like', "%" . $cari . "%")
+        ->paginate($batas);
 
-        // Perform the search using the search term
-        $data_buku = Buku::where('judul', 'like', "%{$cari}%")
-                        ->orWhere('penulis', 'like', "%{$cari}%")
-                        ->paginate($batas);
+    // Hitung jumlah hasil pencarian
+    $jumlah_buku = $data_buku->total();
+    $no = $batas * ($data_buku->currentPage() - 1);
 
-        $jumlah_buku = $data_buku->total();
-        $no = $batas * ($data_buku->currentPage() - 1);
+    // Return ke view search.blade.php dengan data hasil pencarian
+    return view('buku.search', compact('data_buku', 'jumlah_buku', 'no', 'cari'));
+}
 
-        return view('buku.search', compact('jumlah_buku', 'data_buku', 'no', 'cari'));
-    }
 }
     
     
