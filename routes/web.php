@@ -72,6 +72,9 @@ Route::get('/buku/{id}', [BukuController::class, 'show'])->name('buku.show');
 
 Route::get('/buku/search', [BukuController::class, 'search'])->name('buku.search');
 
+Route::get('/bukudatatable', [BukuController::class, 'indexdatatable'])->name('buku.indexdatatable');
+
+
 
 
 
