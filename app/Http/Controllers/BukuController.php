@@ -9,10 +9,9 @@ Paginator::useBootstrapFive();
 
 class BukuController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    // DataTables
+    public function __construct(){
+        $this->middleware('auth');
+    }
     public function indexdatatable()
     {
 
@@ -23,6 +22,7 @@ class BukuController extends Controller
         return view('buku.indexdatatable', compact('data_buku', 'total_buku', 'total_harga'));
 
     }
+
 
     //N0 3 tugas praktikum
     public function index(){

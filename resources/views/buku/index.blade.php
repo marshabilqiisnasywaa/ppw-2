@@ -1,33 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Buku</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/dataTables.bootstrap5.min.css">
+@extends('auth.layouts')
 
-    <style>
-        /* CSS untuk menyesuaikan warna tabel */
-        .table-custom {
-            background-color: #f8f9fa; /* Warna latar belakang */
-        }
-        .table-custom th {
-            background-color: #6f42c1; /* Warna header */
-            color: white; /* Warna teks header */
-        }
-        .table-custom tbody tr:hover {
-            background-color: #e9ecef; /* Warna baris saat hover */
-        }
-    </style>
-</head>
-<body>
-
-    <div class="container mt-5">
+@section('content')
+<div class="container mt-5">
         <h1 class="text-center mb-4">Daftar Buku</h1>
-        <a href="{{ route('buku.create') }}" class="btn btn-primary mb-3">Tambah Buku</a>
+        @if(Auth::check() && Auth::user()->level == 'admin')
+            <a href="{{ route('buku.create') }}" class="btn btn-primary mb-3">Tambah Buku</a>
+        @endif
+        
+        <form action="{{ route('buku.search') }}" method="get">
+            @csrf
+            <input type="text" name="kata" class="form-control my-3 mx-3" placeholder="Cari ...." style="width: 30%; display: inline; margin-top: 10px; margin-bottom: 10px; float:right;">
+        </form>
 
         <table id="myTable" class="table table-striped table-custom table-bordered">
             <thead>
@@ -37,7 +20,9 @@
                     <th>Penulis</th>
                     <th>Harga</th>
                     <th>Tanggal Terbit</th>
+                    @if(Auth::check() && Auth::user()->level == 'admin')
                     <th>Aksi</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -48,6 +33,7 @@
                         <td>{{ $buku->penulis }}</td>
                         <td>{{ "Rp. " . number_format($buku->harga, 0, ',', '.') }}</td>
                         <td>{{ \Carbon\Carbon::parse($buku->tgl_terbit)->format('d/m/Y') }}</td>
+                        @if(Auth::check() && Auth::user()->level == 'admin')
                         <td>
                             <a href="{{ route('buku.edit', $buku->id) }}" class="btn btn-warning btn-sm">Edit</a>
                             <form action="{{ route('buku.destroy', $buku->id) }}" method="POST" style="display:inline-block;">
@@ -58,6 +44,7 @@
                             <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#detailModal"
                                     onclick="showDetail('{{ $buku->judul }}', '{{ $buku->penulis }}', '{{ $buku->harga }}', '{{ \Carbon\Carbon::parse($buku->tgl_terbit)->format('d-m-Y') }}')">Detail</button>
                         </td>
+                        @endif            
                     </tr>
                 @endforeach
             </tbody>
@@ -90,26 +77,4 @@
         </div>
 
     </div>
-
-    <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap5.min.js"></script>
-
-    <script>
-        // Function to show detail modal
-        function showDetail(judul, penulis, harga, tanggal_terbit) {
-            document.getElementById('modalJudul').innerText = judul;
-            document.getElementById('modalPenulis').innerText = penulis;
-            document.getElementById('modalHarga').innerText = "Rp. " + parseFloat(harga).toLocaleString('id-ID', {minimumFractionDigits: 2});
-            document.getElementById('modalTanggalTerbit').innerText = tanggal_terbit;
-        }
-
-        // Initialize DataTables
-        $(document).ready(function() {
-            $('#myTable').DataTable();
-        });
-    </script>
-</body>
-</html>
+@endsection
