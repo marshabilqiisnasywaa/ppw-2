@@ -16,6 +16,7 @@
             <thead>
                 <tr>
                     <th>Id</th>
+                    <th>Thumbnail</th>
                     <th>Judul Buku</th>
                     <th>Penulis</th>
                     <th>Harga</th>
@@ -29,6 +30,13 @@
                 @foreach ($data_buku as $index => $buku)
                     <tr>
                         <td>{{ $index + 1 }}</td>
+                        <td>
+                        @if ($buku->filepath)
+                                <div class="relative h-10 w-10">
+                                    <img src="{{ asset($buku->filepath) }}" alt="" class="h-full w-full rounded-full object-cover object-center">
+                                </div>
+                            @endif
+                        </td>
                         <td>{{ $buku->judul }}</td>
                         <td>{{ $buku->penulis }}</td>
                         <td>{{ "Rp. " . number_format($buku->harga, 0, ',', '.') }}</td>
@@ -41,9 +49,7 @@
                                 @method('DELETE')
                                 <button onclick="return confirm('Yakin mau di hapus?')" type="submit" class="btn btn-danger btn-sm">Hapus</button>
                             </form>
-                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#detailModal"
-                                    onclick="showDetail('{{ $buku->judul }}', '{{ $buku->penulis }}', '{{ $buku->harga }}', '{{ \Carbon\Carbon::parse($buku->tgl_terbit)->format('d-m-Y') }}')">Detail</button>
-                        </td>
+                            
                         @endif            
                     </tr>
                 @endforeach

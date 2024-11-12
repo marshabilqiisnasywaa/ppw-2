@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Buku;
+use App\Models\Gallery;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Pagination\Paginator;
+use Intervention\Image\Facades\Image;
 Paginator::useBootstrapFive();
 
 class BukuController extends Controller
@@ -92,6 +95,22 @@ class BukuController extends Controller
     $buku->tgl_terbit = $request->tgl_terbit;
     $buku->save();
 
+
+    // Handle gallery uploads
+    if ($request->file('gallery')) {
+        foreach ($request->file('gallery') as $file) {
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $filePath = $file->storeAs('uploads', $fileName, 'public');
+
+            Gallery::create([
+                'nama_galeri' => $fileName,
+                'path' => '/storage/' . $filePath,
+                'foto' => $fileName,
+                'buku_id' => $buku->id // Use the ID of the newly created Buku
+            ]);
+        }
+    }
+
     return redirect('/buku')->with('pesan', 'Data Buku Berhasil disimpan');
 }
 
@@ -100,7 +119,11 @@ class BukuController extends Controller
      */
     public function show(string $id)
     {
-        //
+        // Mengambil data buku berdasarkan ID
+        $buku = Buku::findOrFail($id);
+        
+        // Pastikan view 'buku.show' ada dan data buku ditampilkan
+        return view('buku.show', compact('buku'));
     }
 
     /**
@@ -117,11 +140,15 @@ class BukuController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        // dd($request);
+        $buku = Buku::find($id);
+
         $validatedData = $request->validate([
             'judul' => 'required',
             'penulis' => 'required',
             'harga' => 'required|numeric',
             'tgl_terbit' => 'required|date',
+            'thumbnail'=> 'image|mimes:jpeg,jpg,png|max:20000'
         ], [
             'judul.required' => 'Kolom Judul Buku wajib diisi.',
             'penulis.required' => 'Kolom Nama Penulis wajib diisi.',
@@ -131,9 +158,27 @@ class BukuController extends Controller
             'tgl_terbit.date' => 'Kolom Tanggal Terbit tidak valid.'
         ]);
 
-        $buku = Buku::findOrFail($id);
-        $buku->fill($validatedData); // Mengisi properti model dengan data yang divalidasi
+
+        $fileName = time() . '_' . $request->thumbnail->getClientOriginalName();
+        $filePath = $request->file('thumbnail')->storeAs('uploads', $fileName, 'public');
+
+        Image::make(storage_path().'/app/public/uploads/'.$fileName)
+            ->fit(240,320)
+            ->save();
+
+        $buku->update([
+            'judul' => $request->judul,
+            'penulis' => $request->penulis,
+            'harga' => $request->harga,
+            'tgl_terbit' => $request->tgl_terbit,
+            'filename' => $fileName,
+            'filepath' => '/storage/' . $filePath,
+        ]);
+
         $buku->save(); // Menyimpan perubahan ke database
+
+   
+        // dd($buku, $fileName);
 
         return redirect('/buku')->with('pesan', 'Buku berhasil diperbarui.');
     }

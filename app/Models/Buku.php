@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Buku extends Model
 {
@@ -17,11 +18,19 @@ class Buku extends Model
         'judul',
         'penulis',
         'harga',
-        'tgl_terbit'
+        'tgl_terbit',
+        'filename',
+        'filepath',
     ];
+
 
     // Cast 'tgl_terbit' ke tipe 'date'
     protected $casts = [
         'tgl_terbit' => 'date', // atau bisa juga 'datetime'
     ];
+
+    public function galleries(): HasMany
+    {
+        return $this->hasMany(Gallery::class);
+    }
 }
