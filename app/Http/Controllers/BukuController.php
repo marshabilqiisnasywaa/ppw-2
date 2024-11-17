@@ -77,42 +77,47 @@ class BukuController extends Controller
         'judul' => 'required|string',
         'penulis' => 'required|string|max:30',
         'harga' => 'required|numeric',
-        'tgl_terbit' => 'required|date'
-    ], [
-        'judul.required' => 'Kolom Judul Buku wajib diisi.',
-        'penulis.required' => 'Kolom Nama Penulis wajib diisi.',
-        'penulis.max' => 'Kolom Nama Penulis tidak boleh lebih dari 30 karakter.',
-        'harga.required' => 'Kolom Harga Buku wajib diisi.',
-        'harga.numeric' => 'Kolom Harga Buku harus berupa angka.',
-        'tgl_terbit.required' => 'Kolom Tanggal Terbit wajib diisi.',
-        'tgl_terbit.date' => 'Kolom Tanggal Terbit tidak valid.'
+        'tgl_terbit' => 'required|date',
+        'thumbnail' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'galeri.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
     ]);
 
+    // Buat objek buku baru
     $buku = new Buku();
     $buku->judul = $request->judul;
     $buku->penulis = $request->penulis;
     $buku->harga = $request->harga;
     $buku->tgl_terbit = $request->tgl_terbit;
+
+    // Simpan thumbnail
+    if ($request->hasFile('thumbnail')) {
+        $fileName = time() . '_' . $request->thumbnail->getClientOriginalName();
+        $filePath = $request->file('thumbnail')->storeAs('uploads', $fileName, 'public');
+        $buku->thumbnail = '/storage/' . $filePath;
+    }
+
+    // Simpan data buku
     $buku->save();
 
-
-    // Handle gallery uploads
-    if ($request->file('gallery')) {
-        foreach ($request->file('gallery') as $file) {
+    // Simpan galeri
+    if ($request->hasFile('galeri')) {
+        foreach ($request->file('galeri') as $file) {
             $fileName = time() . '_' . $file->getClientOriginalName();
             $filePath = $file->storeAs('uploads', $fileName, 'public');
 
+            // Simpan data galeri ke database
             Gallery::create([
                 'nama_galeri' => $fileName,
                 'path' => '/storage/' . $filePath,
                 'foto' => $fileName,
-                'buku_id' => $buku->id // Use the ID of the newly created Buku
+                'buku_id' => $buku->id
             ]);
         }
     }
 
     return redirect('/buku')->with('pesan', 'Data Buku Berhasil disimpan');
 }
+
 
     /**
      * Display the specified resource.
@@ -139,49 +144,42 @@ class BukuController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
-    {
-        // dd($request);
-        $buku = Buku::find($id);
+{
+    $buku = Buku::findOrFail($id);
 
-        $validatedData = $request->validate([
-            'judul' => 'required',
-            'penulis' => 'required',
-            'harga' => 'required|numeric',
-            'tgl_terbit' => 'required|date',
-            'thumbnail'=> 'image|mimes:jpeg,jpg,png|max:20000'
-        ], [
-            'judul.required' => 'Kolom Judul Buku wajib diisi.',
-            'penulis.required' => 'Kolom Nama Penulis wajib diisi.',
-            'harga.required' => 'Kolom Harga Buku wajib diisi.',
-            'harga.numeric' => 'Kolom Harga Buku harus berupa angka.',
-            'tgl_terbit.required' => 'Kolom Tanggal Terbit wajib diisi.',
-            'tgl_terbit.date' => 'Kolom Tanggal Terbit tidak valid.'
-        ]);
+    $validatedData = $request->validate([
+        'judul' => 'required',
+        'penulis' => 'required',
+        'harga' => 'required|numeric',
+        'tgl_terbit' => 'required|date',
+        'thumbnail'=> 'nullable|image|mimes:jpeg,jpg,png|max:20000'
+    ]);
 
+    // Update data buku
+    $buku->judul = $request->judul;
+    $buku->penulis = $request->penulis;
+    $buku->harga = $request->harga;
+    $buku->tgl_terbit = $request->tgl_terbit;
 
+    // Update thumbnail jika ada
+    if ($request->hasFile('thumbnail')) {
         $fileName = time() . '_' . $request->thumbnail->getClientOriginalName();
         $filePath = $request->file('thumbnail')->storeAs('uploads', $fileName, 'public');
 
-        Image::make(storage_path().'/app/public/uploads/'.$fileName)
-            ->fit(240,320)
+        // Ubah ukuran gambar
+        Image::make(storage_path('app/public/uploads/' . $fileName))
+            ->fit(240, 320)
             ->save();
 
-        $buku->update([
-            'judul' => $request->judul,
-            'penulis' => $request->penulis,
-            'harga' => $request->harga,
-            'tgl_terbit' => $request->tgl_terbit,
-            'filename' => $fileName,
-            'filepath' => '/storage/' . $filePath,
-        ]);
-
-        $buku->save(); // Menyimpan perubahan ke database
-
-   
-        // dd($buku, $fileName);
-
-        return redirect('/buku')->with('pesan', 'Buku berhasil diperbarui.');
+        // Simpan path ke database
+        $buku->thumbnail = '/storage/' . $filePath;
     }
+
+    $buku->save(); // Menyimpan perubahan ke database
+
+    return redirect('/buku')->with('pesan', 'Buku berhasil diperbarui.');
+}
+
 
     /**
      * Remove the specified resource from storage.
