@@ -42,6 +42,21 @@
             <input type="text" id="tgl_terbit" name="tgl_terbit" class="date form-control" placeholder="yyyy/mm/dd">
         </div>
 
+        <!-- Input Thumbnail -->
+        <div class="mb-3">
+            <label for="thumbnail" class="form-label">Thumbnail</label>
+            <input type="file" name="thumbnail" class="form-control" required>
+        </div>
+
+        <!-- Dynamic Gallery File Upload -->
+        <div id="galeri-section">
+            <div class="mb-3">
+                <label for="galeri[]" class="form-label">Galeri</label>
+                <input type="file" name="galeri[]" class="form-control">
+                <input type="file" name="galeri[]" class="form-control">
+            </div>
+        </div>
+
         <!-- Tombol Simpan dan Kembali -->
         <button type="submit" class="btn btn-primary">Simpan</button>
         <a href="{{ url('/buku') }}" class="btn btn-secondary">Kembali</a>

@@ -41,23 +41,22 @@
             <input type="date" name="tgl_terbit" value="{{ $buku->tgl_terbit->format('Y-m-d') }}" 
             class="form-control" required>
 
-        </div>
-            <label for="thumbnail" class="form-label">thumbnail</label>
-            <input type="file" name="thumbnail" 
-            class="form-control" required>
+        <!-- Input Thumbnail -->
+        <div class="mb-3">
+            <label for="thumbnail" class="form-label">Thumbnail</label>
+            <input type="file" name="thumbnail" class="form-control" required>
         </div>
 
 
          <!-- Display Existing Gallery Images -->
         <div class="gallery_items mt-4">
-            <h5>Gallery</h5>
             @foreach($buku->galleries as $gallery)
                 <div class="gallery_item mb-3">
                     <img
                         class="rounded object-cover object-center"
                         src="{{ asset($gallery->path) }}"
                         alt="{{ $gallery->nama_galeri }}"
-                        width="150"
+                        width="400"
                     />
                 </div>
             @endforeach
